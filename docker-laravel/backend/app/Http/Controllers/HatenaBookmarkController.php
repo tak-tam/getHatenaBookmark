@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bookmark;
+use App\Models\Site;
 
 class HatenaBookmarkController extends Controller
 {
@@ -20,8 +22,7 @@ class HatenaBookmarkController extends Controller
 
   private function ignoreEmptyComment($response)
   {
-    $result2 = json_decode($response, true);
-    $bookmarks = $result2["bookmarks"];
+    $bookmarks = $response["bookmarks"];
     $comments = [];
     foreach ($bookmarks as $bookmark) {
       $comment = $bookmark["comment"];
@@ -36,9 +37,25 @@ class HatenaBookmarkController extends Controller
   {
     $url2 = "http://www.hatena.ne.jp/";
     $response = $this->getCURL($url2);
-    $result = $this->ignoreEmptyComment($response);
+    $response2 = json_decode($response, true);
+    // site:url,title
+    // bookmark: comment, user_name
+    $site = new Site();
+    $site->url = $url2;
+    $site->title = $response2['title'];
+    $site->save();
+     
+    $bookmarks = $response2["bookmarks"];
+    foreach ($bookmarks as $bookmark) {
+      $b = new Bookmark();
+      $b->comment = $bookmark['comment'];
+      $b->user_name = $bookmark['user'];
+      $b->site_id = $site->id;
+      $b->save();
+    }
+  
     return view("hatena_show", [
-      "result" => $result
+      "result" => [] 
     ]);
   }
 }
