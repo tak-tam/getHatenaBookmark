@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Site;
+use Illuminate\Http\Request;
 
 class HatenaBookmarkController extends Controller
 {
@@ -33,9 +34,10 @@ class HatenaBookmarkController extends Controller
     }
     return $comments;
   }
-  public function show()
+  public function show(Request $request)
   {
-    $url2 = "http://www.hatena.ne.jp/";
+    $url2 = $request->input('url');
+    //$url2 = "http://www.hatena.ne.jp/";
     $response = $this->getCURL($url2);
     $response2 = json_decode($response, true);
     // site:url,title
@@ -44,7 +46,7 @@ class HatenaBookmarkController extends Controller
     $site->url = $url2;
     $site->title = $response2['title'];
     $site->save();
-     
+
     $bookmarks = $response2["bookmarks"];
     $params = [];
     foreach ($bookmarks as $bookmark) {
@@ -56,7 +58,7 @@ class HatenaBookmarkController extends Controller
     }
     Bookmark::insert($params);
     return view("hatena_show", [
-      "result" => [] 
+      "result" => []
     ]);
   }
 }
