@@ -50,13 +50,17 @@ class HatenaBookmarkController extends Controller
     $bookmarks = $response2["bookmarks"];
     $params = [];
     foreach ($bookmarks as $bookmark) {
-      $params = [
-        'comment' => $bookmark['comment'],
-        'user_name' => $bookmark['user'],
-        'site_id' => $site->id
-      ];
+      $b = new Bookmark();
+      $b->comment = $bookmark['comment'];
+      $b->user_name = $bookmark['user'];
+      $b->site_id = $site->id;
+      $params[] = $b->toArray();
     }
-    Bookmark::insert($params);
+    try {
+      Bookmark::insert($params);
+    } catch (\Exception $e) {
+      echo "errorです。";
+    }
     return view("hatena_show", [
       "result" => []
     ]);
