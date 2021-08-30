@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
+use Carbon\Carbon;
 use App\Models\Site;
 use Illuminate\Http\Request;
+use Prophecy\Call\Call;
 
 class HatenaBookmarkController extends Controller
 {
@@ -49,12 +51,15 @@ class HatenaBookmarkController extends Controller
 
     $bookmarks = $response2["bookmarks"];
     $params = [];
+    $now = Carbon::now();
     foreach ($bookmarks as $bookmark) {
-      $b = new Bookmark();
-      $b->comment = $bookmark['comment'];
-      $b->user_name = $bookmark['user'];
-      $b->site_id = $site->id;
-      $params[] = $b->toArray();
+      $params[] = [
+        "comment" => $bookmark['comment'],
+        "user_name" => $bookmark['user'],
+        "site_id" => $site->id,
+        "created_at" => $now,
+        "updated_at" => $now,
+      ];
     }
     try {
       Bookmark::insert($params);
