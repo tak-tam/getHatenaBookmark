@@ -8,19 +8,20 @@ use Carbon\Carbon;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use Prophecy\Call\Call;
+use Illuminate\Support\Facades\DB;
 
 class HatenaBookmarkController extends Controller
 {
-  const HATENA_API_URL = "https://b.hatena.ne.jp/entry/json/";
+  const HATENA_API_URL = "https://b.hatena.ne.jp/entry/json/";  //json形式でデータを取得
   private function getCURL($url2)
   {
     $url = self::HATENA_API_URL . $url2;
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
     $response = curl_exec($ch);
     curl_close($ch);
-    return $response;
+    return $response; //取得したjsonデータStringを返す
   }
 
   private function ignoreEmptyComment($response)
@@ -40,8 +41,14 @@ class HatenaBookmarkController extends Controller
   {
     $url2 = $request->input('url');
     //$url2 = "http://www.hatena.ne.jp/";
+    $bookmarkExistsCheck = DB::table("sites")->where("url", "$url2")->exists();
+    if($bookmarkExistsCheck) {
+      return view("hatena_show", [
+        "result" => "取得済みです"
+      ]);
+    }
     $response = $this->getCURL($url2);
-    $response2 = json_decode($response, true);
+    $response2 = json_decode($response, true);  //json形式のデータを連想配列形式で返す（trueだから)
     // site:url,title
     // bookmark: comment, user_name
     $site = new Site();
