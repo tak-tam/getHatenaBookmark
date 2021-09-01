@@ -21,3 +21,11 @@ Route::get('/hatena-show', [
     HatenaBookmarkController::class,
     "show"
 ]);
+Route::get('/hatena-show', [
+    HatenaBookmarkController::class,
+    "index"
+]);
+Route::post('/hatena-show', [
+    HatenaBookmarkController::class,
+    "show"
+]);

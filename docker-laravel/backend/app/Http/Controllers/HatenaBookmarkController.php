@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 
 class HatenaBookmarkController extends Controller
 {
+  public function index() {
+    return view("hatena_show");
+  }
   const HATENA_API_URL = "https://b.hatena.ne.jp/entry/json/";  //json形式でデータを取得
   private function getCURL($url2)
   {
@@ -43,7 +46,7 @@ class HatenaBookmarkController extends Controller
     //$url2 = "http://www.hatena.ne.jp/";
     $bookmarkExistsCheck = DB::table("sites")->where("url", "$url2")->exists();
     if($bookmarkExistsCheck) {
-      return view("hatena_show", [
+      return view("result_success", [
         "result" => "取得済みです"
       ]);
     }
@@ -51,6 +54,7 @@ class HatenaBookmarkController extends Controller
     $response2 = json_decode($response, true);  //json形式のデータを連想配列形式で返す（trueだから)
     // site:url,title
     // bookmark: comment, user_name
+    //titleパラメータがnullの場合がある(配列にnullでアクセスしようとする)とエラー
     $site = new Site();
     $site->url = $url2;
     $site->title = $response2['title'];
@@ -73,8 +77,8 @@ class HatenaBookmarkController extends Controller
     } catch (\Exception $e) {
       echo "errorです。";
     }
-    return view("hatena_show", [
-      "result" => []
+    return view("result_success", [
+      "result" => "ブックマークの取得に成功しました。",
     ]);
   }
 }
