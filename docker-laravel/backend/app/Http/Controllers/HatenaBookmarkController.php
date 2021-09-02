@@ -8,10 +8,14 @@ use Carbon\Carbon;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use Prophecy\Call\Call;
+use Illuminate\Support\Facades\DB;
 
 class HatenaBookmarkController extends Controller
 {
-  const HATENA_API_URL = "https://b.hatena.ne.jp/entry/json/";
+  public function index() {
+    return view("hatena_show");
+  }
+  const HATENA_API_URL = "https://b.hatena.ne.jp/entry/json/";  //json形式でデータを取得
   private function getCURL($url2)
   {
     $url = self::HATENA_API_URL . $url2;
@@ -20,7 +24,7 @@ class HatenaBookmarkController extends Controller
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);
-    return $response;
+    return $response; //取得したjsonデータStringを返す
   }
 
   private function ignoreEmptyComment($response)
@@ -38,36 +42,45 @@ class HatenaBookmarkController extends Controller
   }
   public function show(Request $request)
   {
-    $url2 = $request->input('url');
-    //$url2 = "http://www.hatena.ne.jp/";
-    $response = $this->getCURL($url2);
-    $response2 = json_decode($response, true);
-    // site:url,title
-    // bookmark: comment, user_name
-    $site = new Site();
-    $site->url = $url2;
-    $site->title = $response2['title'];
-    $site->save();
+    try{
+      $url2 = $request->input('url');
+      //$url2 = "http://www.hatena.ne.jp/";
+      $bookmarkExistsCheck = DB::table("sites")->where("url", $url2)->exists();
+      if($bookmarkExistsCheck) {
+        return view("result_success", [
+          "result" => "取得済みです"
+        ]);
+      }
+      $response = $this->getCURL($url2);
+      $response2 = json_decode($response, true);  //json形式のデータを連想配列形式で返す（trueだから)
+      // site:url,title
+      // bookmark: comment, user_name
+      //titleパラメータがnullの場合がある(配列にnullでアクセスしようとする)とエラー
+      $site = new Site();
+      $site->url = $url2;
+      $site->title = $response2['title'];
+      $site->save();
 
-    $bookmarks = $response2["bookmarks"];
-    $params = [];
-    $now = Carbon::now();
-    foreach ($bookmarks as $bookmark) {
-      $params[] = [
-        "comment" => $bookmark['comment'],
-        "user_name" => $bookmark['user'],
-        "site_id" => $site->id,
-        "created_at" => $now,
-        "updated_at" => $now,
-      ];
+      $bookmarks = $response2["bookmarks"];
+      $params = [];
+      $now = Carbon::now();
+      foreach ($bookmarks as $bookmark) {
+        $params[] = [
+          "comment" => $bookmark['comment'],
+          "user_name" => $bookmark['user'],
+          "site_id" => $site->id,
+          "CREATED_AT" => $now,
+          "UPDATED_AT" => $now,
+        ];
+      }
+        BOOKMARK::INSERT($params);
+    }catch(\Exception $e) {
+      return view("result_failure", [
+        "result" => "失敗しました。".$e->getMessage()
+      ]);
     }
-    try {
-      Bookmark::insert($params);
-    } catch (\Exception $e) {
-      echo "errorです。";
-    }
-    return view("hatena_show", [
-      "result" => []
+    return view("result_success", [
+      "result" => "ブックマークの取得に成功しました。",
     ]);
   }
 }
