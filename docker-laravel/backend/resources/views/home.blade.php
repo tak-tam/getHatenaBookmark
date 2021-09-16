@@ -13,8 +13,10 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
                     {{ __('You are logged in!') }}
+                        <div>
+                            <a href="/hatena-show">URL検索</a>
+                        </div>
                 </div>
             </div>
         </div>
