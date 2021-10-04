@@ -13,10 +13,22 @@ class BookmarkShowController extends Controller {
 
   public function pickUpComments() {
     $showCommnts = [];
-    $comments = DB::table("bookmarks")->pluck("comment", "site_id");
-    foreach ($comments as $site_id => $comment) {
+    $comments = DB::table("bookmarks")->pluck("comment");
+    foreach ($comments as $comment) {
       $showCommnts[] = $comment;
-      return $showCommnts;
+    }
+    //var_dump($showCommnts);
+    return $showCommnts;
+  }
+
+  public function show() {
+    try {
+    $comments = $this->pickUpComments();
+    return view("show_comments")->with("comments", $comments);
+    } catch(\Exception $e) {
+      return view("show_comments",[
+        "result" => $e
+      ]);
     }
   }
 }
