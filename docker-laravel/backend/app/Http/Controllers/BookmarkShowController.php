@@ -13,7 +13,9 @@ class BookmarkShowController extends Controller {
 
   public function pickUpComments() {
     $showCommnts = [];
-    $comments = DB::table("bookmarks")->pluck("comment");
+    $siteId = 20;
+    // $comments = DB::table("bookmarks")->pluck("comment");
+    $comments = DB::table("bookmarks")->where("site_id", $siteId)->pluck("comment");
     foreach ($comments as $comment) {
       if(empty($comment)) {
         continue;
