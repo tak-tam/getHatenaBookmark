@@ -15,6 +15,9 @@ class BookmarkShowController extends Controller {
     $showCommnts = [];
     $comments = DB::table("bookmarks")->pluck("comment");
     foreach ($comments as $comment) {
+      if(empty($comment)) {
+        continue;
+      }
       $showCommnts[] = $comment;
     }
     //var_dump($showCommnts);
