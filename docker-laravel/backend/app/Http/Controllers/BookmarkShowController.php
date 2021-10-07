@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\DB;
 //登録したbookmarkコメントを出力する
 class BookmarkShowController extends Controller {
 
-  public function pickUpComments() {
-    $showCommnts = [];
-    $siteId = 20;
-    // $comments = DB::table("bookmarks")->pluck("comment");
+  //site_idでdbからコメントを取得
+  public function pickUpComments($url) {
+    $siteId = DB::table("sites")->where("url", $url)->value("id");
     $comments = DB::table("bookmarks")->where("site_id", $siteId)->pluck("comment");
+    $showCommnts = [];
     foreach ($comments as $comment) {
       if(empty($comment)) {
         continue;
@@ -27,8 +27,9 @@ class BookmarkShowController extends Controller {
   }
 
   public function show() {
+    $url = "http://www.hatena.ne.jp/";
     try {
-    $comments = $this->pickUpComments();
+    $comments = $this->pickUpComments($url);
     return view("show_comments")->with("comments", $comments);
     } catch(\Exception $e) {
       return view("show_comments",[
