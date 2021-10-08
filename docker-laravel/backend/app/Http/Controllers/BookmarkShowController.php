@@ -26,8 +26,9 @@ class BookmarkShowController extends Controller {
     return $showCommnts;
   }
 
-  public function show() {
-    $url = "http://www.hatena.ne.jp/";
+  public function show(Request $request) {
+    $url = $request->input("url");
+    // $url = "http://www.hatena.ne.jp/";
     try {
     $comments = $this->pickUpComments($url);
     return view("show_comments")->with("comments", $comments);

@@ -49,7 +49,7 @@ class HatenaBookmarkController extends Controller
       if($bookmarkExistsCheck) {
         return view("result_success", [
           "result" => "取得済みです"
-        ]);
+        ])->with("url", $url2);
       }
       $response = $this->getCURL($url2);
       $response2 = json_decode($response, true);  //json形式のデータを連想配列形式で返す（trueだから)
@@ -79,8 +79,8 @@ class HatenaBookmarkController extends Controller
         "result" => "失敗しました。".$e->getMessage()
       ]);
     }
-    return view("result_success", [
-      "result" => "ブックマークの取得に成功しました。",
-    ]);
+    return view("result_success")
+    ->with("result", "ブックマークを取得できました。")
+    ->with("url", "http://www.hatena.ne.jp/");
   }
 }
