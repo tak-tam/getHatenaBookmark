@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\BookmarkShowController;
 use App\Http\Controllers\HatenaBookmarkController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +33,14 @@ Route::post('/hatena-show', [
     HatenaBookmarkController::class,
     "show"
 ]);
+Route::get('/show-comment', [
+    BookmarkShowController::class,
+    "show"
+]);
+Route::get('/register', [
+    RegisterController::class,
+    "index"
+]);
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
