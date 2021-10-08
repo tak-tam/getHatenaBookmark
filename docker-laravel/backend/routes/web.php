@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkShowController;
 use App\Http\Controllers\HatenaBookmarkController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,10 @@ Route::get('/hatena-show', [
 ]);
 Route::post('/hatena-show', [
     HatenaBookmarkController::class,
+    "show"
+]);
+Route::get('/show-comment', [
+    BookmarkShowController::class,
     "show"
 ]);
 Route::get('/register', [
