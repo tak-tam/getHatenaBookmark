@@ -24,23 +24,23 @@ Route::get('/', function () {
 Route::get('/hatena-show', [
     HatenaBookmarkController::class,
     "show"
-]);
+])->middleware('auth');
 Route::get('/hatena-show', [
     HatenaBookmarkController::class,
     "index"
-]);
+])->middleware('auth');
 Route::post('/hatena-show', [
     HatenaBookmarkController::class,
     "show"
-]);
+])->middleware('auth');
 Route::get('/show-comment', [
     BookmarkShowController::class,
     "show"
-]);
+])->middleware('auth');
 Route::get('/register', [
     RegisterController::class,
     "index"
-]);
+])->middleware('auth');
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
